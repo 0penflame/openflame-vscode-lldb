@@ -1,6 +1,6 @@
 {
 	"name": "vscode-lldb",
-	"displayName": "CodeLLDB",
+	"displayName": "CodeLLDB (OpenFlame)",
 	"version": "@VERSION@",
 	"publisher": "vadimcn",
 	"description": "Debugger for native code, powered by LLDB. Debug C++, Rust, and other compiled languages.",
@@ -818,6 +818,28 @@
 							"request": "attach",
 							"name": "${2:Attach}",
 							"pid": "^\"\\${command:pickMyProcess}\" // use \\${command:pickProcess} to pick other users' processes"
+						}
+					},
+					{
+						"label": "CodeLLDB: Attach to OpenFlame Service",
+						"description": "Pick a running OpenFlame service process and attach to it.",
+						"body": {
+							"type": "lldb",
+							"request": "attach",
+							"name": "${1:Attach}",
+							"pid": "^\"\\${command:PickOpenflameProcess}\"",
+							"sourceLanguages": [ "rust" ]
+						}
+					},
+					{
+						"label": "CodeLLDB: Run and Attach to OpenFlame Service",
+						"description": "Start the configured OpenFlame service, then attach to its process.",
+						"body": {
+							"type": "lldb",
+							"request": "attach",
+							"name": "${1:Run and Attach}",
+							"pid": "^\"\\${command:RunOpenflameProcess}\"",
+							"sourceLanguages": [ "rust" ]
 						}
 					},
 					{

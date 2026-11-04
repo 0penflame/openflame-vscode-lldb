@@ -3,13 +3,14 @@ project(CodeLLDB)
 enable_testing()
 
 set(VERSION "1.12.3") # Base version
+set(UPSTREAM_VERSION "${VERSION}")
 
 include(cmake/CopyFiles.cmake)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INSTALL_PREFIX $ENV{HOME}/.vscode/extensions/codelldb CACHE PATH "Install location")
 
-set(VERSION_SUFFIX "-" CACHE INTERNAL "Version suffix")
+set(VERSION_SUFFIX "-openflame.1" CACHE INTERNAL "Version suffix")
 if (VERSION_SUFFIX STREQUAL "-")
     string(TIMESTAMP VERSION_SUFFIX "-dev.%y%m%d%H%M" UTC)
 endif()
@@ -212,8 +213,8 @@ endforeach()
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/vscodeignore-full ${Content})
 
 set(VsceOptions
-    --baseContentUrl https://github.com/vadimcn/codelldb/blob/v${VERSION}
-    --baseImagesUrl https://github.com/vadimcn/codelldb/raw/v${VERSION}
+    --baseContentUrl https://github.com/vadimcn/codelldb/blob/v${UPSTREAM_VERSION}
+    --baseImagesUrl https://github.com/vadimcn/codelldb/raw/v${UPSTREAM_VERSION}
     --skip-license
 )
 
