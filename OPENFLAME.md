@@ -76,6 +76,40 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 cmake --build build --target vsix_full   # -> build/codelldb-full.vsix
 ```
 
+## Releasing a build
+
+The OpenFlame workspace image does not keep a copy of the `.vsix`: it
+downloads the asset of a GitHub release of this repository and checks it
+against a pinned sha256 (`tools/vsix-releases.txt` and
+`tools/fetch-vsix.sh` in `0penflame/openflame-workspace`).
+This repository is public, so the workspace build downloads the asset
+from the release download URL without a token.
+
+1. Merge the change into `master` (pull request, squash). Bump the
+   `-openflame.<n>` suffix for an OpenFlame-only rebuild of the same
+   upstream release.
+2. Build the `.vsix` from exactly the merged commit, in a clean
+   checkout, with the build steps above.
+3. Cut the release on that commit, with the `.vsix` as its only asset:
+
+   ```sh
+   V=<version>                       # e.g. 1.12.3-openflame.1
+   SHA=$(git rev-parse HEAD)         # the merged commit the .vsix was built from
+   cp build/codelldb-full.vsix codelldb-$V-linux-x64.vsix
+   shasum -a 256 codelldb-$V-linux-x64.vsix
+   gh release create "v$V" codelldb-$V-linux-x64.vsix --repo 0penflame/openflame-vscode-lldb \
+     --target "$SHA" --title "CodeLLDB $V" \
+     --notes "Built from $SHA. sha256 of codelldb-$V-linux-x64.vsix: <sha256>"
+   ```
+
+   Never replace the asset of an existing release; cut a new version.
+4. In `0penflame/openflame-workspace`, update the `codelldb.vsix` line of
+   `tools/vsix-releases.txt` (tag, asset name, sha256) in a pull request.
+   The image build fails if the downloaded asset does not match the pinned
+   sha256. Running workspaces pick up the new build on their next start
+   after the image is rolled out (the entrypoint resyncs bundled extensions
+   whose `.vsix` changed).
+
 ## Rebasing onto the next upstream release
 
 1. `git fetch upstream --tags`
@@ -88,5 +122,5 @@ cmake --build build --target vsix_full   # -> build/codelldb-full.vsix
    (`extension/pickProcess.ts`, `extension/main.ts` `resolveDebugConfiguration*`,
    `src/codelldb-types/src/lib.rs` `AttachRequestArguments.pid`).
 5. Update `lldb_release`/`rust_version` in the build above from upstream's
-   `build.yml`, build `vsix_full` for `linux-x64`, and replace
-   `extensions/codelldb.vsix` in openflame-workspace.
+   `build.yml`, build `vsix_full` for `linux-x64`, and release it (see "Releasing a
+   build").
